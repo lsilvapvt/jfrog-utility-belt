@@ -74,9 +74,3 @@ fi
 
 ## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone     | openssl x509
 ## Clear DNS cache on Mac BigSur: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
-
-
-# MASTER_KEY 21c98c5d9227305b4a97a7b0ef63ca94f85bc26ec55073b21e88c886e605a35c
-# JOIN_KEY 50964f6da8253252f63080580afeaa202b331344d2d61d114dabe48bf16e1ba0
-# POSTGRES_PASSWORD 9453cf4525398f526d6e0bd1
-# ADMIN_PASSWORD 6f22cab8027e6b5f
