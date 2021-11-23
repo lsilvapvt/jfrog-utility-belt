@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ "$#" -eq  "0" ]
 then
-    echo "No arguments supplied. Use either install or uninstall"
+    echo "No arguments supplied. Use either install, uninstall, upgrade or status"
 else 
   export JPD_NAMESPACE="jpd"
   export JPD_HELMNAME="jpd"
@@ -43,8 +43,8 @@ else
 
     helm upgrade --install ${JPD_HELMNAME} \
                  --namespace ${JPD_NAMESPACE} \
-                 --set global.masterKeySecretName=jpdmasterkey \
-                 --set global.joinKeySecretName=jpdjoinkey \
+                 --set global.masterKey=${MASTER_KEY} \
+                 --set global.joinKey=${JOIN_KEY} \
                  --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                  --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                  --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
@@ -54,8 +54,8 @@ else
                 #  --set databaseUpgradeReady='true' \
                 #  --set artifactory.artifactory.consoleLog='true' \
                 #  --set artifactory.artifactory.openMetrics.enabled='true' \
-                #  --set global.masterKey=${MASTER_KEY} \
-                #  --set global.joinKey=${JOIN_KEY} \
+                #  --set global.masterKeySecretName=jpdmasterkey \
+                #  --set global.joinKeySecretName=jpdjoinkey \
 
   else 
     if [ $1 == "uninstall" ]
@@ -66,11 +66,45 @@ else
        sleep 60 
        echo "Deleting JPD namespace"
        kubectl delete -f namespace.yaml
+
+    else 
+      export MASTER_KEY=$(kubectl get secret jpdmasterkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."master-key" ')
+      export JOIN_KEY=$(kubectl get secret jpdjoinkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."join-key" ')
+      export POSTGRES_PASSWORD=$(kubectl get secret jpdpostgresspwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."postgres-pwd" ')
+      export ADMIN_PASSWORD=$(kubectl get secret jpdadminpwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-pwd" ')
+
+      echo "MASTER_KEY $MASTER_KEY"
+      echo "JOIN_KEY $JOIN_KEY"
+      echo "POSTGRES_PASSWORD $POSTGRES_PASSWORD"
+      echo "ADMIN_PASSWORD $ADMIN_PASSWORD"
+
+      if [ $1 == "upgrade" ]
+      then
+        echo "Upgrading Helm Chart"
+
+        helm upgrade --install ${JPD_HELMNAME} \
+                    --namespace ${JPD_NAMESPACE} \
+                    --set global.masterKey=${MASTER_KEY} \
+                    --set global.joinKey=${JOIN_KEY} \
+                    --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
+                    --set global.database.adminPassword=${POSTGRES_PASSWORD} \
+                    --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
+                    -f customvalues.yaml \
+                    jfrog/jfrog-platform
+
+      else 
+        if [ $1 == "status" ]
+        then
+          echo "Status of JPD Helm Chart"
+
+          helm status ${JPD_HELMNAME} --namespace ${JPD_NAMESPACE}
+
+        fi
+      fi 
     fi 
   fi 
 fi
 
 
-
-## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone     | openssl x509
+## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone | openssl x509
 ## Clear DNS cache on Mac BigSur: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder

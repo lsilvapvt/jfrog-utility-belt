@@ -1,10 +1,10 @@
-global:
-  jfrogUrl: https://jpd.workshops.zone 
-  jfrogUrlUI: https://jpd.workshops.zone 
+# global:
+#   jfrogUrl: https://jpd.
+#   jfrogUrlUI: https://jpd.
   # certificates added to this secret will be copied to $JFROG_HOME/<product>/var/etc/security/keys/trusted directory
-  customCertificates:
-    enabled: true
-    certificateSecretName: jpd-tls                 
+  # customCertificates:
+  #   enabled: true
+  #   certificateSecretName: jpd-tls                 
 
 artifactory:
   enabled: true
@@ -15,18 +15,32 @@ artifactory:
       secret: artifactory-cluster-license
       dataKey: art.lic
 
-xray:
-  enabled: false
-insight:
-  enabled: false 
-distribution:
-  enabled: false
-pipelines:
-  enabled: false
-rabbitmq:
-  enabled: false
-redis:
-  enabled: false
-      
+    # ingress:
+    #   enabled: true
+    #   tls:
+    #   - secretName: jpd-tls 
+    #     hosts:
+    #       - jpd.workshops.zone
 
+  # access:
+    ## Enable TLS by changing the tls entry (under the security section) in the access.config.yaml file.
+    ## ref: https://www.jfrog.com/confluence/display/JFROG/Managing+TLS+Certificates#ManagingTLSCertificates
+    ## When security.tls is set to true, JFrog Access will act as the Certificate Authority (CA) and sign the TLS certificates used by all the different JFrog Platform nodes.
+    ## This ensures that the node to node communication is done over TLS.
+    # accessConfig:
+    #   security:
+    #     tls: true
+    # customCertificatesSecretName: jpd-tls
+    # resetAccessCAKeys: true
+
+# xray:
+#   enabled: true
+# insight:
+#   enabled: true
+# distribution:
+#   enabled: true
+# pipelines:
+#   enabled: true
+# redis:
+#   enabled: true 
 
