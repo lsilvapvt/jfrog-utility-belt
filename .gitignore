@@ -2,4 +2,8 @@ credentials.yml
 license.*
 art.lic
 cert.crt
+main_rt.crt
+main_rt.key
 cert.key
+acmegpgkey.json
+*.gpg

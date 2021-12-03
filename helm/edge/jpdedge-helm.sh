@@ -3,14 +3,12 @@ if [ "$#" -eq  "0" ]
 then
     echo "No arguments supplied. Use either install, uninstall, upgrade or status"
 else 
-  export JPD_NAMESPACE="jpd"
-  export JPD_HELMNAME="jpd"
+  export JPD_NAMESPACE="edge"
+  export JPD_HELMNAME="edge"
 
   if [ $1 == "install" ]
   then
-    # Install the JFrog Platform Helm chart 
-    ## https://www.jfrog.com/confluence/display/JFROG/Installing+the+JFrog+Platform+Using+Helm+Chart
-    ## https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users
+    # Install the Artifactory Helm chart for an edge node
 
     ## Create keys and passwords as kubernetes secrets in the JPD namespace
     export MASTER_KEY=$(openssl rand -hex 32)
@@ -24,22 +22,32 @@ else
     echo "ADMIN_PASSWORD $ADMIN_PASSWORD"
 
     kubectl apply -f namespace.yaml
-    kubectl create secret generic jpdjoinkey -n ${JPD_NAMESPACE} --from-literal=join-key=${JOIN_KEY}
-    kubectl create secret generic jpdmasterkey -n ${JPD_NAMESPACE} --from-literal=master-key=${MASTER_KEY}
-    kubectl create secret generic jpdpostgresspwd -n ${JPD_NAMESPACE} --from-literal=postgres-pwd=${POSTGRES_PASSWORD}
-    kubectl create secret generic jpdadminpwd -n ${JPD_NAMESPACE} --from-literal=admin-pwd=${ADMIN_PASSWORD}
+    kubectl create secret generic edgejoinkey -n ${JPD_NAMESPACE} --from-literal=join-key=${JOIN_KEY}
+    kubectl create secret generic edgemasterkey -n ${JPD_NAMESPACE} --from-literal=master-key=${MASTER_KEY}
+    kubectl create secret generic edgepostgresspwd -n ${JPD_NAMESPACE} --from-literal=postgres-pwd=${POSTGRES_PASSWORD}
+    kubectl create secret generic edgeadminpwd -n ${JPD_NAMESPACE} --from-literal=admin-pwd=${ADMIN_PASSWORD}
 
     ## Prepare TLS Certificates
     ## https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users#HelmChartsforAdvancedUsers-EstablishingTLSandAddingCertificates
-    kubectl create secret tls jpd-tls \
+    kubectl create secret tls edge-tls \
             --cert=./cert.crt \
             --key=./cert.key \
+            -n ${JPD_NAMESPACE}
+
+    ## Prepare Main Artifactory Root Certificate to establish Circle of Trust
+    ## https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-EstablishingaCircleofTrust
+    ## Run this command against the main instance's K8s namespace (e.g. "jpd"): 
+    ## kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/root.crt > main_rt.crt
+    ## kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/private.key > main_rt.key
+    kubectl create secret tls main-root-cert \
+            --cert=./main_rt.crt \
+            --key=./main_rt.key \
             -n ${JPD_NAMESPACE}
 
     ## Prepare the license file 
     ## https://github.com/jfrog/charts/tree/master/stable/jfrog-platform#kubernetes-secret
     # Have local license file saved as 'art.lic
-    kubectl create secret generic artifactory-cluster-license --from-file=./art.lic --namespace ${JPD_NAMESPACE}
+    kubectl create secret generic artifactory-edge-license --from-file=./art.lic --namespace ${JPD_NAMESPACE}
 
     helm upgrade --install ${JPD_HELMNAME} \
                  --namespace ${JPD_NAMESPACE} \
@@ -52,16 +60,10 @@ else
                  -f customvalues.yaml \
                  jfrog/jfrog-platform
 
-                #  --set databaseUpgradeReady='true' \
-                #  --set artifactory.artifactory.consoleLog='true' \
-                #  --set artifactory.artifactory.openMetrics.enabled='true' \
-                #  --set global.masterKeySecretName=jpdmasterkey \
-                #  --set global.joinKeySecretName=jpdjoinkey \
-
   else 
     if [ $1 == "uninstall" ]
     then
-       echo "Deleting Helm Chart"
+       echo "Deleting Artifactory Edge Helm Chart"
        helm uninstall ${JPD_HELMNAME} -n ${JPD_NAMESPACE} 
        echo "Waiting for helm resources to be cleaned up"
        sleep 60 
@@ -69,10 +71,10 @@ else
        kubectl delete -f namespace.yaml
 
     else 
-      export MASTER_KEY=$(kubectl get secret jpdmasterkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."master-key" ')
-      export JOIN_KEY=$(kubectl get secret jpdjoinkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."join-key" ')
-      export POSTGRES_PASSWORD=$(kubectl get secret jpdpostgresspwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."postgres-pwd" ')
-      export ADMIN_PASSWORD=$(kubectl get secret jpdadminpwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-pwd" ')
+      export MASTER_KEY=$(kubectl get secret edgemasterkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."master-key" ')
+      export JOIN_KEY=$(kubectl get secret edgejoinkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."join-key" ')
+      export POSTGRES_PASSWORD=$(kubectl get secret edgepostgresspwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."postgres-pwd" ')
+      export ADMIN_PASSWORD=$(kubectl get secret edgeadminpwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-pwd" ')
 
       echo "MASTER_KEY $MASTER_KEY"
       echo "JOIN_KEY $JOIN_KEY"
@@ -81,7 +83,7 @@ else
 
       if [ $1 == "upgrade" ]
       then
-        echo "Upgrading Helm Chart"
+        echo "Upgrading Artifactory Edge Helm Chart"
 
         helm upgrade --install ${JPD_HELMNAME} \
                     --namespace ${JPD_NAMESPACE} \
@@ -97,7 +99,7 @@ else
       else 
         if [ $1 == "status" ]
         then
-          echo "Status of JPD Helm Chart"
+          echo "Status of Artifactory Edge Helm Chart"
 
           helm status ${JPD_HELMNAME} --namespace ${JPD_NAMESPACE}
 
@@ -107,23 +109,9 @@ else
   fi 
 fi
 
-
 ## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone | openssl x509
 ## Clear DNS cache on Mac BigSur: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
-## To get root cert of main Artifactory: 
-## kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/root.crt > main_rt.crt
-
-# TBD: 
-# - identify that system is up and running (check state of pods and ping command result?)
-# - Deploy EDGE 
-# - Create Circle of Trust (https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-EstablishingaCircleofTrust)
-#       Copy to var/etc/access/keys/trusted/main-jdp.crt 
-#       Use config map and mounts? https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users#HelmChartsforAdvancedUsers-AdvancedOptionsforPipelines
-# - Add EDGE as platform node (https://www.jfrog.com/confluence/display/JFROG/Managing+Platform+Deployments)
-# - Create GPG keys and register public key for distribution
-
-# Sand Test 
-# Pre-load artifacts 
-# Create Release bundle, Sign and Distribute it to Edge 
-
+## After pod is running and system is in good shape:
+# Create Circle of Trust - Copy main-root-cert to access keys trusted folder
+# kubectl exec -it ${JPD_HELMNAME}-artifactory-0 -n ${JPD_HELMNAME} -c artifactory -- cp var/etc/security/keys/trusted/ca.crt var/etc/access/keys/trusted/main-jpd.crt

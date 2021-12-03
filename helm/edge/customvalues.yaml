@@ -1,0 +1,30 @@
+global:
+#   jfrogUrl: https://jpd.
+#   jfrogUrlUI: https://jpd.
+  # certificates added to this secret will be copied to $JFROG_HOME/<product>/var/etc/security/keys/trusted directory
+  customCertificates:
+    enabled: true
+    certificateSecretName: main-root-cert                 
+
+artifactory:
+  enabled: true
+  artifactory:
+    # Note: For HA deployments, set replicaCount >1 (recommended 3)
+    replicaCount: 1
+    license:
+      secret: artifactory-edge-license
+      dataKey: art.lic
+
+xray:
+  enabled: false
+insight:
+  enabled: false
+distribution:
+  enabled: false
+pipelines:
+  enabled: false
+redis:
+  enabled: false
+rabbitmq:
+  enabled: false
+
