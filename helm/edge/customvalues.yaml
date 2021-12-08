@@ -1,6 +1,4 @@
 global:
-#   jfrogUrl: https://jpd.
-#   jfrogUrlUI: https://jpd.
   # certificates added to this secret will be copied to $JFROG_HOME/<product>/var/etc/security/keys/trusted directory
   customCertificates:
     enabled: true

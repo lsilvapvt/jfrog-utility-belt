@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Install the Artifactory Helm chart for an edge node
+
 if [ "$#" -eq  "0" ]
 then
     echo "No arguments supplied. Use either install, uninstall, upgrade or status"
@@ -8,23 +11,34 @@ else
 
   if [ $1 == "install" ]
   then
-    # Install the Artifactory Helm chart for an edge node
 
-    ## Create keys and passwords as kubernetes secrets in the JPD namespace
-    export MASTER_KEY=$(openssl rand -hex 32)
-    export JOIN_KEY=$(openssl rand -hex 32)
-    export POSTGRES_PASSWORD=$(openssl rand -hex 12)
-    export ADMIN_PASSWORD=$(openssl rand -hex 8)
+    # Pre-reqs - Define the following environment variables 
+    # export JPD_PROTOCOL="http"
+    # export JPD_DOMAIN="jpd.jfrog.pro"
+    # export MASTER_KEY=$(openssl rand -hex 32)
+    # export JOIN_KEY=$(openssl rand -hex 32)
+    # export POSTGRES_PASSWORD=$(openssl rand -hex 12)
+    # export ADMIN_PASSWORD=$(openssl rand -hex 8)
+    # export ADMIN_USERNAME="admin"
 
+    # Optional - source separate secrets.sh file to define pre-req env vars 
+    source ./secrets.sh
+
+    echo "EDGE_PROTOCOL $JPD_PROTOCOL"
+    echo "EDGE_DOMAIN $JPD_DOMAIN"
     echo "MASTER_KEY $MASTER_KEY"
     echo "JOIN_KEY $JOIN_KEY"
     echo "POSTGRES_PASSWORD $POSTGRES_PASSWORD"
+    echo "ADMIN_USER $ADMIN_USERNAME"
     echo "ADMIN_PASSWORD $ADMIN_PASSWORD"
 
     kubectl apply -f namespace.yaml
+    kubectl create secret generic edgeprotocol -n ${JPD_NAMESPACE} --from-literal=jpd-protocol=${JPD_PROTOCOL}
+    kubectl create secret generic edgedomain -n ${JPD_NAMESPACE} --from-literal=jpd-domain=${JPD_DOMAIN}
     kubectl create secret generic edgejoinkey -n ${JPD_NAMESPACE} --from-literal=join-key=${JOIN_KEY}
     kubectl create secret generic edgemasterkey -n ${JPD_NAMESPACE} --from-literal=master-key=${MASTER_KEY}
     kubectl create secret generic edgepostgresspwd -n ${JPD_NAMESPACE} --from-literal=postgres-pwd=${POSTGRES_PASSWORD}
+    kubectl create secret generic edgeadminuser -n ${JPD_NAMESPACE} --from-literal=admin-user=${ADMIN_USERNAME}
     kubectl create secret generic edgeadminpwd -n ${JPD_NAMESPACE} --from-literal=admin-pwd=${ADMIN_PASSWORD}
 
     ## Prepare TLS Certificates
@@ -53,11 +67,12 @@ else
                  --namespace ${JPD_NAMESPACE} \
                  --set global.masterKey=${MASTER_KEY} \
                  --set global.joinKey=${JOIN_KEY} \
+                 --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                 --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
                  --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                  --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                  --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
-                 --set artifactory.artifactory.replicator.enabled='true' \
-                 -f customvalues.yaml \
+                 -f customvalues-ingress.yaml \
                  jfrog/jfrog-platform
 
   else 
@@ -71,14 +86,20 @@ else
        kubectl delete -f namespace.yaml
 
     else 
+      export JPD_PROTOCOL=$(kubectl get secret edgeprotocol -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-protocol" ')
+      export JPD_DOMAIN=$(kubectl get secret edgedomain -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-domain" ')
       export MASTER_KEY=$(kubectl get secret edgemasterkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."master-key" ')
       export JOIN_KEY=$(kubectl get secret edgejoinkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."join-key" ')
       export POSTGRES_PASSWORD=$(kubectl get secret edgepostgresspwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."postgres-pwd" ')
+      export ADMIN_USER=$(kubectl get secret edgeadminuser -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-user" ')
       export ADMIN_PASSWORD=$(kubectl get secret edgeadminpwd -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-pwd" ')
 
+      echo "EDGE_PROTOCOL $JPD_PROTOCOL"
+      echo "EDGE_DOMAIN $JPD_DOMAIN"
       echo "MASTER_KEY $MASTER_KEY"
       echo "JOIN_KEY $JOIN_KEY"
       echo "POSTGRES_PASSWORD $POSTGRES_PASSWORD"
+      echo "ADMIN_USER $ADMIN_USER"
       echo "ADMIN_PASSWORD $ADMIN_PASSWORD"
 
       if [ $1 == "upgrade" ]
@@ -89,11 +110,12 @@ else
                     --namespace ${JPD_NAMESPACE} \
                     --set global.masterKey=${MASTER_KEY} \
                     --set global.joinKey=${JOIN_KEY} \
+                    --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                    --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
                     --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                     --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                     --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
-                    --set artifactory.artifactory.replicator.enabled='true' \
-                    -f customvalues.yaml \
+                    -f customvalues-ingress.yaml \
                     jfrog/jfrog-platform
 
       else 
@@ -115,3 +137,9 @@ fi
 ## After pod is running and system is in good shape:
 # Create Circle of Trust - Copy main-root-cert to access keys trusted folder
 # kubectl exec -it ${JPD_HELMNAME}-artifactory-0 -n ${JPD_HELMNAME} -c artifactory -- cp var/etc/security/keys/trusted/ca.crt var/etc/access/keys/trusted/main-jpd.crt
+
+
+# kubectl wait --namespace ingress-nginx \
+#   --for=condition=ready pod \
+#   --selector=app.kubernetes.io/component=controller \
+#   --timeout=120s

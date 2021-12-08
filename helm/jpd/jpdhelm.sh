@@ -144,10 +144,10 @@ fi
 # - Create Circle of Trust (https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-EstablishingaCircleofTrust)
 #       Copy to var/etc/access/keys/trusted/main-jdp.crt 
 #       Use config map and mounts? https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users#HelmChartsforAdvancedUsers-AdvancedOptionsforPipelines
-# - Add EDGE as platform node (https://www.jfrog.com/confluence/display/JFROG/Managing+Platform+Deployments)
-# - Create GPG keys and register public key for distribution
+# - Add EDGE as JPD platform node (https://www.jfrog.com/confluence/display/JFROG/Managing+Platform+Deployments)
+# - Create GPG keys and register public key for distribution and propagate it
 
-# Sand Test 
+# Smoke Test 
 # Pre-load artifacts 
 # Create Release bundle, Sign and Distribute it to Edge 
 

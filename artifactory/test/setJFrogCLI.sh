@@ -38,6 +38,9 @@ jfrog config add $JPD_ALIAS \
   --password "$JPD_PASSWORD" \
   --overwrite --interactive=false
 
+### TBD Access Token is required to register JPDs in later config steps. How to create it? 
+###   --access-token "..." 
+
 echo "------"
 echo "List details of created JFrog CLI alias"
 jfrog config show $JPD_ALIAS

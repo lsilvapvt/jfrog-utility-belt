@@ -7,4 +7,5 @@ main_rt.key
 cert.key
 acmegpgkey.json
 secrets.sh
+tmpgen_*.*
 *.gpg
