@@ -1,0 +1,8 @@
+{
+    "key" : "acmeco_deb",
+    "packageType" : "debian",
+    "description": "The virtual repository for debian files",
+    "repositories" : [ "acmeco_deb_local", "acmeco_deb_remote" ],
+    "defaultDeploymentRepo" : "acmeco_deb_local",
+    "rclass" : "virtual"
+  }

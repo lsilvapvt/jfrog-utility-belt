@@ -1,0 +1,8 @@
+{
+    "key": "acmeco_deb_remote",
+    "rclass" : "remote",
+    "packageType": "debian",
+    "description": "The remote repository for debian files",
+    "url":"http://archive.ubuntu.com/ubuntu/",
+    "xrayIndex" : "false"
+}

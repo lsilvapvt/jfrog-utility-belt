@@ -1,0 +1,10 @@
+http://ftp.us.debian.org/debian/pool/main/a/apt/apt_2.3.13_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/p/postgresql-common/postgresql_13+225_all.deb
+http://ftp.us.debian.org/debian/pool/main/c/chromium/chromium_90.0.4430.212-1_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/f/firefox-esr/firefox-esr_78.14.0esr-1~deb11u1_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/n/nss-tls/tlslookup_1.1-1_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/d/dvdauthor/dvdauthor_0.7.2-1+b3_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/i/imagination/imagination_3.6-1_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/s/spyder/spyder_4.2.1+dfsg1-3_all.deb
+http://ftp.us.debian.org/debian/pool/main/t/tcc/tcc_0.9.27+git20200814.62c30a4a-1_amd64.deb
+http://ftp.us.debian.org/debian/pool/main/t/tmate/tmate_2.4.0-2_amd64.deb

@@ -6,4 +6,5 @@ main_rt.crt
 main_rt.key
 cert.key
 acmegpgkey.json
+secrets.sh
 *.gpg

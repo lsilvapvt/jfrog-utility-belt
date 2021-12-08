@@ -1,0 +1,7 @@
+{
+    "key": "acmeco_deb_local",
+    "rclass" : "local",
+    "packageType": "debian",
+    "description": "The local repository for debian files",
+    "xrayIndex" : "true"
+}
