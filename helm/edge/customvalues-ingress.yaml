@@ -17,13 +17,12 @@ artifactory:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         proxy_pass_header   Server;
-        proxy_set_header    X-JFrog-Override-Base-Url http://edge1.jfrog.pro;
-
-    # kubernetes.io/tls-acme: "true"
-    # tls:
-    # - secretName: jpd-tls 
-    #   hosts:
-    #     - edge1.jfrog.pro
+        proxy_set_header    X-JFrog-Override-Base-Url https://edge1.jfrog.pro;
+      kubernetes.io/tls-acme: "true"
+    tls:
+    - secretName: edge-tls 
+      hosts:
+        - edge1.jfrog.pro
     # Additional ingress rules
     # additionalRules: []
 
@@ -44,12 +43,10 @@ artifactory:
           nginx.ingress.kubernetes.io/proxy-buffering: "off"
           nginx.ingress.kubernetes.io/configuration-snippet: |
             chunked_transfer_encoding on;
-
-        # tls: []
-        #  Secrets must be manually created in the namespace.
-        # - hosts:
-        #   - artifactory.domain.example
-        #   secretName: chart-example-tls-secret
+        tls:
+        - secretName: edge-tls 
+          hosts:
+            - edge1.jfrog.pro
       ## When replicator is enabled and want to use tracker feature, trackerIngress.enabled flag should be set to true
       ## Please refer - https://www.jfrog.com/confluence/display/JFROG/JFrog+Peer-to-Peer+%28P2P%29+Downloads
       trackerIngress:

@@ -67,8 +67,8 @@ else
                  --namespace ${JPD_NAMESPACE} \
                  --set global.masterKey=${MASTER_KEY} \
                  --set global.joinKey=${JOIN_KEY} \
-                 --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
-                 --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                 --set global.jfrogUrl=${JPD_PROTOCOL}://${JPD_DOMAIN} \
+                 --set global.jfrogUrlUI=${JPD_PROTOCOL}://${JPD_DOMAIN} \
                  --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                  --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                  --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
@@ -110,8 +110,8 @@ else
                     --namespace ${JPD_NAMESPACE} \
                     --set global.masterKey=${MASTER_KEY} \
                     --set global.joinKey=${JOIN_KEY} \
-                    --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
-                    --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                    --set global.jfrogUrl=${JPD_PROTOCOL}://${JPD_DOMAIN} \
+                    --set global.jfrogUrlUI=${JPD_PROTOCOL}://${JPD_DOMAIN} \
                     --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                     --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                     --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \

@@ -1,8 +1,8 @@
-# global:
+global:
   # certificates added to this secret will be copied to $JFROG_HOME/<product>/var/etc/security/keys/trusted directory
-  # customCertificates:
-  #   enabled: true
-  #   certificateSecretName: jpd-tls                 
+  customCertificates:
+    enabled: true
+    certificateSecretName: jpd-tls                 
 
 artifactory:
   enabled: true
@@ -17,15 +17,15 @@ artifactory:
       nginx.ingress.kubernetes.io/proxy-body-size: "0"
       nginx.ingress.kubernetes.io/configuration-snippet: |
         proxy_pass_header   Server;
-        proxy_set_header    X-JFrog-Override-Base-Url http://jpd.jfrog.pro;
-
-    # kubernetes.io/tls-acme: "true"
-    # tls:
-    # - secretName: jpd-tls 
-    #   hosts:
-    #     - jpd.jfrog.pro
+        proxy_set_header    X-JFrog-Override-Base-Url https://jpd.jfrog.pro;
+      kubernetes.io/tls-acme: "true"
+    tls:
+    - secretName: jpd-tls 
+      hosts:
+        - jpd.jfrog.pro
     # Additional ingress rules
     # additionalRules: []
+
   artifactory:
     # Note: For HA deployments, set replicaCount >1 (recommended 3)
     replicaCount: 1
@@ -43,11 +43,12 @@ artifactory:
           nginx.ingress.kubernetes.io/configuration-snippet: |
             chunked_transfer_encoding on;
 
-        # tls: []
-        #  Secrets must be manually created in the namespace.
-        # - hosts:
-        #   - artifactory.domain.example
-        #   secretName: chart-example-tls-secret
+          kubernetes.io/tls-acme: "true"
+        tls:
+        - secretName: jpd-tls 
+          hosts:
+          - jpd.jfrog.pro
+
       ## When replicator is enabled and want to use tracker feature, trackerIngress.enabled flag should be set to true
       ## Please refer - https://www.jfrog.com/confluence/display/JFROG/JFrog+Peer-to-Peer+%28P2P%29+Downloads
       trackerIngress:
@@ -64,8 +65,6 @@ artifactory:
         #   - artifactory.domain.example
         #   secretName: chart-example-tls-secret
 
-
-
   # access:
     ## Enable TLS by changing the tls entry (under the security section) in the access.config.yaml file.
     ## ref: https://www.jfrog.com/confluence/display/JFROG/Managing+TLS+Certificates#ManagingTLSCertificates
@@ -79,12 +78,26 @@ artifactory:
 
 xray:
   enabled: true
+  router:
+    tlsEnabled: false
 insight:
   enabled: true
+  router:
+    tlsEnabled: false
 distribution:
   enabled: true
+  initContainerImage: releases-docker.jfrog.io/jfrog/ubi-minimal:8.5-204
+  router:
+    tlsEnabled: false
+  # distribution: 
+  #   preStartCommand: "mkdir -p {{ .Values.distribution.persistence.mountPath }}/etc/security/keys/trusted && cp -fv /tmp/ca.crt {{ .Values.distribution.persistence.mountPath }}/etc/security/keys/trusted/ca.crt"
+  # common:
+  #   customVolumeMounts:
+
 pipelines:
   enabled: true
+  router:
+    tlsEnabled: true
 redis:
   enabled: true 
 rabbitmq:

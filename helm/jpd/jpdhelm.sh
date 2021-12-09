@@ -15,8 +15,8 @@ else
   then
 
     # Pre-reqs - Define the following environment variables 
-    # export JPD_PROTOCOL="http"
-    # export JPD_DOMAIN="jpd.jfrog.pro"
+    # export JPD_PROTOCOL="https"
+    # export JPD_DOMAIN="my.jfrog.io"
     # export MASTER_KEY=$(openssl rand -hex 32)
     # export JOIN_KEY=$(openssl rand -hex 32)
     # export POSTGRES_PASSWORD=$(openssl rand -hex 12)
@@ -60,8 +60,8 @@ else
                  --namespace ${JPD_NAMESPACE} \
                  --set global.masterKey=${MASTER_KEY} \
                  --set global.joinKey=${JOIN_KEY} \
-                 --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
-                 --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                 --set global.jfrogUrl=${JPD_PROTOCOL}://${JPD_DOMAIN} \
+                 --set global.jfrogUrlUI=${JPD_PROTOCOL}://${JPD_DOMAIN} \
                  --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                  --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                  --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
@@ -106,12 +106,12 @@ else
       then
         echo "Upgrading Helm Chart"
 
-        helm upgrade --install ${JPD_HELMNAME} \
+        helm upgrade ${JPD_HELMNAME} \
                     --namespace ${JPD_NAMESPACE} \
                     --set global.masterKey=${MASTER_KEY} \
                     --set global.joinKey=${JOIN_KEY} \
-                    --set global.jfrogUrl=${JPD_PROTOCOL}//${JPD_DOMAIN} \
-                    --set global.jfrogUrlUI=${JPD_PROTOCOL}//${JPD_DOMAIN} \
+                    --set global.jfrogUrl=${JPD_PROTOCOL}://${JPD_DOMAIN} \
+                    --set global.jfrogUrlUI=${JPD_PROTOCOL}://${JPD_DOMAIN} \
                     --set artifactory.artifactory.admin.password=${ADMIN_PASSWORD} \
                     --set global.database.adminPassword=${POSTGRES_PASSWORD} \
                     --set postgresql.postgresqlPassword=${POSTGRES_PASSWORD} \
