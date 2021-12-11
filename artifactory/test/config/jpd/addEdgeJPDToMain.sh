@@ -12,6 +12,7 @@ export JPD_ALIAS="jpdpro"
 
 # Optional: instead, set pre-req variables from kubernetes secrets previosly set by the helm install script 
 export EDGE_NAMESPACE="edge"
+echo "Retrieving JPD information from secrets in Kubernetes namespace $JPD_NAMESPACE"
 export JPD_PROTOCOL=$(kubectl get secret edgeprotocol -n ${EDGE_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-protocol" ')
 export JPD_DOMAIN=$(kubectl get secret edgedomain -n ${EDGE_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-domain" ')
 export JPD_JOIN_KEY=$(kubectl get secret edgejoinkey -n ${EDGE_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."join-key" ')

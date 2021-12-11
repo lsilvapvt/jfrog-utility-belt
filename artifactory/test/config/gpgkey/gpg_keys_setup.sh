@@ -12,6 +12,7 @@ set -e
 
 # Optional: instead, set pre-req variables from kubernetes secrets previosly set by the helm install script 
 export JPD_NAMESPACE="jpd"
+echo "Retrieving JPD information from secrets in Kubernetes namespace $JPD_NAMESPACE"
 export JPD_PROTOCOL=$(kubectl get secret jpdprotocol -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-protocol" ')
 export JPD_DOMAIN=$(kubectl get secret jpddomain -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-domain" ')
 export JPD_USER=$(kubectl get secret jpdadminuser -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."admin-user" ')
@@ -67,7 +68,7 @@ cat > acmegpgkey.json <<EOF
 EOF
 
 ## Upload GPG Signing Key for Distribution (api)
-echo "Upload GPG info json file to JPD"
+echo "Upload GPG info json file to JPD $JPD_PROTOCOL://$JPD_DOMAIN"
 
 # API failed when using Access Token
 # curl -H "Authorization: Bearer $JFROG_ACCESSTOKEN" -X POST $JFROG_PROTOCOL://$JFROG_URL/distribution/api/v1/keys/gpg/ -H 'Content-Type: application/json' -T acmegpgkey.json

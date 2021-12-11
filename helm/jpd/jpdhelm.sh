@@ -3,6 +3,9 @@
 # Install the JFrog Platform Helm chart 
 ## https://www.jfrog.com/confluence/display/JFROG/Installing+the+JFrog+Platform+Using+Helm+Chart
 ## https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users
+## Pre-req
+## - Create TLS Certificate 
+## - Have license 
 
 if [ "$#" -eq  "0" ]
 then
@@ -86,6 +89,7 @@ else
        kubectl delete -f namespace.yaml
 
     else 
+      echo "Retrieving JPD information from secrets in Kubernetes namespace $JPD_NAMESPACE"
       export JPD_PROTOCOL=$(kubectl get secret jpdprotocol -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-protocol" ')
       export JPD_DOMAIN=$(kubectl get secret jpddomain -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."jpd-domain" ')
       export MASTER_KEY=$(kubectl get secret jpdmasterkey -n ${JPD_NAMESPACE} -o json | jq -r '.data | map_values(@base64d) | ."master-key" ')
@@ -135,19 +139,45 @@ fi
 ## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone | openssl x509
 ## Clear DNS cache on Mac BigSur: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
-## To get root cert of main Artifactory: 
-## kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/root.crt > main_rt.crt
 
 # TBD: 
 # - identify that system is up and running (check state of pods and ping command result?)
-# - Deploy EDGE 
-# - Create Circle of Trust (https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-EstablishingaCircleofTrust)
-#       Copy to var/etc/access/keys/trusted/main-jdp.crt 
-#       Use config map and mounts? https://www.jfrog.com/confluence/display/JFROG/Helm+Charts+for+Advanced+Users#HelmChartsforAdvancedUsers-AdvancedOptionsforPipelines
+# kubectl wait --namespace ingress-nginx \
+#   --for=condition=ready pod \
+#   --selector=app.kubernetes.io/component=controller \
+#   --timeout=120s
+#
+# - Prep for Edge install: Copy root cert to edge install folder 
+#   To get root cert and private key of main Artifactory: 
+#   kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/root.crt > main_rt.crt
+#   kubectl exec jpd-artifactory-0 -n jpd -c artifactory -- cat var/etc/access/keys/private.key > main_rt.key
+#
+# - Create Access Token - TBD 
+#   TBD issue: how to automatically create one with the Access API, which requires another Access Token for auth?
+#
+# - Prep CLI config with Access Token or USER/PWD
+#
+# - Deploy EDGE and configure Circle of Trust with root cert of main JPD
+#
 # - Add EDGE as JPD platform node (https://www.jfrog.com/confluence/display/JFROG/Managing+Platform+Deployments)
-# - Create GPG keys and register public key for distribution and propagate it
-
-# Smoke Test 
-# Pre-load artifacts 
-# Create Release bundle, Sign and Distribute it to Edge 
-
+# - Update HOME JPD location details
+#
+# - Create GPG keys, register public key for distribution and then propagate it
+#
+# - Pre-load sample artifacts 
+#
+# - Distribution: - Create Release bundle, Sign and Distribute it to Edge - use API cals script 
+#
+# - XRay - DB sync 
+#   TBD issue: how to programmatically trigger the initial XUC DB sync?
+#   TBD issue: check if DB sync is ready? How ?
+#
+# - XRay - Add builds, files and release bundles to indexing. Trigger initial index.
+# 
+# - XRay - Add Policies, Watches and Reports 
+# 
+# - Pipelines - configure nodes, dynamic nodes
+#             - configure test pipeline for RB release creation and distribution
+#
+# - Smoke Test ?
+# 

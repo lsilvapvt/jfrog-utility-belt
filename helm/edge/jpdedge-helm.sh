@@ -131,15 +131,8 @@ else
   fi 
 fi
 
-## Check certs: echo -n | openssl s_client -connect jpd.workshops.zone:443 -servername jpd.workshops.zone | openssl x509
-## Clear DNS cache on Mac BigSur: sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
-
 ## After pod is running and system is in good shape:
-# Create Circle of Trust - Copy main-root-cert to access keys trusted folder
-# kubectl exec -it ${JPD_HELMNAME}-artifactory-0 -n ${JPD_HELMNAME} -c artifactory -- cp var/etc/security/keys/trusted/ca.crt var/etc/access/keys/trusted/main-jpd.crt
-
-
-# kubectl wait --namespace ingress-nginx \
-#   --for=condition=ready pod \
-#   --selector=app.kubernetes.io/component=controller \
-#   --timeout=120s
+#
+# - Create Circle of Trust - Copy main-root-cert to access keys trusted folder (https://www.jfrog.com/confluence/display/JFROG/Access+Tokens#AccessTokens-EstablishingaCircleofTrust)
+#   kubectl exec -it ${JPD_HELMNAME}-artifactory-0 -n ${JPD_HELMNAME} -c artifactory -- cp var/etc/security/keys/trusted/ca.crt var/etc/access/keys/trusted/main-jpd.crt
+#   
