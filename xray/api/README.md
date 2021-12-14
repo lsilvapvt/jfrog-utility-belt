@@ -53,6 +53,10 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
         }'
   ```
 
+- **Programmatically create an XRay report**  
+  (for all/as many repositories as needed - per type or package)  
+  [Link to sample bash script](https://gist.github.com/lsilvapvt/e6af30b489fa19309f8450a14016598c).
+
 
 - **Create a report for builds scan** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-GenerateVulnerabilitiesReport)  
   
