@@ -31,6 +31,29 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
   -X GET "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/reports/231"
   ```
 
+- **Create a report for repositories scan** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-GenerateVulnerabilitiesReport)  
+  
+  ```
+    curl -u $ADMIN_USERNAME:$ADMIN_PASSWORD \
+    -X POST "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/reports/vulnerabilities" \
+    -H "Accept: application/json" \
+    -H 'Content-Type: application/json' \
+    -d '{
+            "name": "log4jshell-repositories-report",
+            "resources" : {
+                "repositories": [
+                    {
+                        "name": "shire-maven-dev-local"
+                    }
+                ]
+            },
+            "filters": {
+                "cve": "CVE-2021-44228"
+            }
+        }'
+  ```
+
+
 - **Create a report for builds scan** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-GenerateVulnerabilitiesReport)  
   
   ```
