@@ -153,7 +153,7 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
   ```
 
 
-- **Get Artifactory summary** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-ArtifactSummary)  
+- **Get Artifact summary** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-ArtifactSummary)  
   
   ```
     curl -u $ADMIN_USERNAME:$ADMIN_PASSWORD \
