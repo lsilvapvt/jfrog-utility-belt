@@ -128,7 +128,8 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
                 "cve": "CVE-2021-44228"
             }
         }'
-    ```
+  ```
+
 
 8. **Get contents of a vulnerabilities report** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-GetViolationsReportContent)  
   
@@ -137,6 +138,7 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
     -X POST "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/reports/vulnerabilities/254?direction=asc&page_num=1&num_of_rows=30&order_by=cve"
   ```
 
+
 9. **Export and visualize report contents in JSON/PDF/CSV format** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-Export)  
   
   ```
@@ -144,6 +146,7 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
     -X GET "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/reports/export/254?file_name=build_vuln&format=json" \
     --output build_report.zip 
   ```
+
 
 ---
 
@@ -164,12 +167,14 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
     -X GET "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/binMgr/c0358340-490d-45ce-a496-7475f61d4179/repos"
   ```
 
+
 12. **Get Builds Indexed** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-GetBuildsIndexingConfiguration)  
   
   ```
     curl -u $ADMIN_USERNAME:$ADMIN_PASSWORD \
     -X GET "$JPD_PROTOCOL://$JPD_DOMAIN/xray/api/v1/binMgr/c0358340-490d-45ce-a496-7475f61d4179/builds"
   ```
+
 
 13. **Get Build summary** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-BuildSummary)  
   
@@ -233,6 +238,7 @@ export ADMIN_PASSWORD="ENCRYPTED_PASSWORD"
             ]
         }'
   ```
+
 
 17. **Find CVEs by Component** [API](https://www.jfrog.com/confluence/display/JFROG/Xray+REST+API#XrayRESTAPI-FindCVEsbyComponent)  
   
