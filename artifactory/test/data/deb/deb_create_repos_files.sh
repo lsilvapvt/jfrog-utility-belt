@@ -26,7 +26,7 @@ cat ./deb_files.txt | while read fileEntry
     wget ${fileEntry}
     fileName=$(basename ${fileEntry})
     echo "Uploading file ${fileName}"
-    jfrog rt upload ./${fileName} ${DEB_REPO_LOCAL}/tools/
+    jfrog rt upload ./${fileName} ${DEB_REPO_LOCAL}/tools/ --target-props "deb.distribution=trusty;deb.component=main;deb.architecture=amd64"
     echo "Deleting ${fileName}"
     rm ${fileName}
     echo "-------------------"
