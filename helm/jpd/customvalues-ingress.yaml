@@ -77,15 +77,15 @@ artifactory:
     # resetAccessCAKeys: true
 
 xray:
-  enabled: true
+  enabled: false
   router:
     tlsEnabled: false
 insight:
-  enabled: true
+  enabled: false
   router:
     tlsEnabled: false
 distribution:
-  enabled: true
+  enabled: false
   initContainerImage: releases-docker.jfrog.io/jfrog/ubi-minimal:8.5-204
   router:
     tlsEnabled: false
@@ -95,13 +95,13 @@ distribution:
   #   customVolumeMounts:
 
 pipelines:
-  enabled: true
+  enabled: false
   router:
     tlsEnabled: true
 redis:
-  enabled: true 
+  enabled: false 
 rabbitmq:
-  enabled: true
+  enabled: false
 
 # xray:
 #   enabled: false

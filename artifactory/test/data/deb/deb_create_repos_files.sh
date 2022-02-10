@@ -31,3 +31,5 @@ cat ./deb_files.txt | while read fileEntry
     rm ${fileName}
     echo "-------------------"
   done
+
+# head -c 75M /dev/urandom > helloworld-web/pkg/opt/file.out
