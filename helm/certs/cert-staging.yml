@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: articert-staging
+  namespace: my-certs
+spec:
+  secretName: articert-tls
+  issuerRef:
+    name: letsencrypt-staging
+  commonName: jfrog.pro
+  dnsNames:
+  - jfrog.pro
+  - jpd.jfrog.pro

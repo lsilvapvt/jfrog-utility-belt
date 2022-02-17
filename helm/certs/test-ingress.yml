@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: contour
+    # cert-manager.io/issuer: "letsencrypt-staging"
+  name: artifactory-main
+  namespace: artifactory          
+spec:
+  tls:
+  - hosts:
+    - workshops.zone
+    - jfrog.workshops.zone
+    secretName: jfrog-example-tls
+  rules:
+  - host: jfrog.workshops.zone
+    http:
+      paths:
+      - backend:
+          service:
+            name: artifactory-artifactory-nginx
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  - host: workshops.zone
+    http:
+      paths:
+      - backend:
+          service:
+            name: artifactory-artifactory-nginx
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+

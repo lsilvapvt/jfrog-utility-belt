@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: articert-prod
+  namespace: my-certs
+spec:
+  secretName: articert-prod-tls
+  issuerRef:
+    name: letsencrypt-prod
+  commonName: jfrog.pro
+  dnsNames:
+  - jfrog.pro
+  - jpd.jfrog.pro
