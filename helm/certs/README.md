@@ -10,6 +10,10 @@
 
 3. Extract or download certificate 
 
+   ```
    kubectl get secret -n NAMESPACE SECRET_KEY -o json | jq -r '.data."tls.crt"' | base64 -d
+
    kubectl get secret -n NAMESPACE SECRET_KEY -o json | jq -r '.data."tls.key"' | base64 -d
+
+   ```
    
